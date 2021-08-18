@@ -21,7 +21,7 @@ library(assertthat)
 ######################### data processing functions ############################
 ################################################################################
 
-#' @description takes microdata and processes the variables to create an
+#' data_process: takes microdata and processes the variables to create an
 #' analytic dataset 
 #' 
 #' @param orig_data unprocessed microdata
@@ -98,7 +98,7 @@ data_process <- function(orig_data, codebook, fullvars, urban_xwalk) {
 }
 
 
-#' @description generate hesitancy reason indicators
+#' generate_indicators: generate hesitancy reason indicators
 #'
 #' @param data analytic dataset
 #' @param value value associated with a reason for hesitancy
@@ -111,6 +111,8 @@ generate_indicators <- function(data, value) {
     mutate(!!varname := ifelse(grepl(value_string, reasons), 1, 0))
 }
 
+#'indicator_loop: loops through generate_indicators
+#'
 #' @param data analytic dataset
 #' @param values list of values for hesitancy reasons
 #'
@@ -126,7 +128,7 @@ indicator_loop <- function(data, values) {
 ######################### data analysis functions ##############################
 ################################################################################
 
-#' @description calculates the percent for a binary outcome (typically vaccine
+#' intent_by: calculates the percent for a binary outcome (typically vaccine
 #' intent) within all values of a stratifying variable defined by a group 
 #'
 #' @param data output from data_process
@@ -167,7 +169,7 @@ intent_by <- function(data, fullvars, group, outcome) {
     mutate(label = labels)
 }
 
-#' @description calculates the percentage of a binary outcome within a specified strata,
+#' calc_intent: calculates the percentage of a binary outcome within a specified strata,
 #' or calculates the change in the outcome between two months (outcome typically vaccine
 #' intent)
 #'
@@ -232,7 +234,7 @@ calc_intent <- function(data, group, outcome, change = FALSE) {
   return(res)
 }
 
-#' @description iterates calc_intent function for a list of variables
+#' iter_intent: iterates calc_intent function for a list of variables
 #'
 #' @param data analytic dataset
 #' @param var_list list of binary variables
@@ -243,7 +245,7 @@ iter_intent <- function(data, var_list, outcome) {
   map(var_list, ~calc_intent(data, .x, outcome))
 }
 
-#' @description creates a table of risk ratios for a given categorical variable.
+#' rr_table: creates a table of risk ratios for a given categorical variable.
 #' also allows adjusted risk ratios if adjustment variables specified
 #'
 #' @param data analytic dataset
@@ -308,7 +310,7 @@ rr_table <- function(data, fullvars, group, outcome, adj_vars = "", prefix = "")
   final
 }
 
-#' @description calculate percent hesitant, very hesitant, employed outside of home, 
+#' calc_xtabs: calculate percent hesitant, very hesitant, employed outside of home, 
 #' vaccinated, as well as adjusted and unadjusted risk ratios for specified categorical 
 #' variables and outputs to dataframe
 #'
@@ -353,7 +355,7 @@ calc_xtabs <- function(data, groups, fullvars, adj_vars) {
   return(final)
 }
 
-#' @description estimate percent with a specified hesitancy reason
+#' hestiancy_reason_estimates: estimate percent with a specified hesitancy reason
 #'
 #' @param data analytic dataset
 #' @param outcome hesitancy reason (binary)
@@ -369,7 +371,7 @@ hesitancy_reason_estimates <- function(data, outcome) {
   )
 }
 
-#' @description create a table of hesitancy reasons labelled by
+#' reasons_table: create a table of hesitancy reasons labelled by
 #' the subgroup analyzed
 #'
 #' @param data analytic dataset (typically subsetted to an occupation 
@@ -392,7 +394,7 @@ reasons_table <- function(data, label) {
     rename(!!paste0(label, " \n N = ", num) := intent_no)
 }
 
-#' @description create time trends for specified list of binary variables,
+#' trend_tables: create time trends for specified list of binary variables,
 #' (typically occupations), including both monthly estimates and changes
 #' between specified months
 #'
@@ -422,7 +424,7 @@ trend_tables <- function(var_list, monthly_data, change_data, outcome = "hesitan
 ######################### table formatting functions ###########################
 ################################################################################
 
-#' @description formats numeric values from a table to create cells with
+#' format_cells: formats numeric values from a table to create cells with
 #' an estimate (lower CI, upper CI) with specified number of digits and
 #' possibly rescaled
 #'
@@ -439,7 +441,7 @@ format_cells <- function(num, lci, uci, digits, mult = 1) {
          format(round(mult*uci, digits), nsmall = digits), ")")
 }
 
-#' @description create Tables 1 and 2 from occupation paper
+#' create_main_table: create Tables 1 and 2 from occupation paper
 #'
 #' @param results output from calc_xtabs
 #' @param category_order specified order of categorical variables
@@ -506,7 +508,7 @@ create_main_table <- function(results, category_order) {
   gt_tbl 
 }
 
-#' @description formats the time trends tables
+#' format_trend_table: formats the time trends tables
 #'
 #' @param trend_table output from trend_tables 
 #'
@@ -530,7 +532,7 @@ format_trend_table <- function(trend_table) {
     arrange(Description) 
 }
 
-#' @description takes a list of hesitancy reason tables and joins them to
+#' full_reasons_table: takes a list of hesitancy reason tables and joins them to
 #' compare reasons by different occupation categories
 #'
 #' @param intent_table_list list of hesitancy reason tables
@@ -552,7 +554,7 @@ full_reasons_table <- function(intent_table_list) {
 ####################### sample summary statistics ##############################
 ################################################################################
 
-#' @description takes analytic dataset and returns number associated with
+#' full_flow: takes analytic dataset and returns number associated with
 #' various exclusions in the data analysis
 #'
 #' @param data analytic dataset
@@ -614,7 +616,7 @@ full_flow <- function(data) {
   gt(res)
 }
 
-#' @description takes analytic dataset and returns smaller subset
+#' summary_flow: takes analytic dataset and returns smaller subset
 #' of flow statistics compared to full_flow
 #'
 #' @param data analytic dataset
@@ -653,7 +655,7 @@ summary_flow <- function(data) {
   return(res)
 }
 
-#' @description takes analytic file and outputs sample characteristics
+#' sample_characteristics: takes analytic file and outputs sample characteristics
 #'
 #' @param data analytic file
 #'
